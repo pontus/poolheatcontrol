@@ -1,0 +1,9 @@
+---
+
+solaredge:
+  apikey: APIKEY
+  siteid: siteid
+
+aquatemp:
+  username: user@example.com
+  password: PASSWORDISGOOD
