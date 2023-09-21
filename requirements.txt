@@ -1,0 +1,4 @@
+requests
+solaredge
+pyyaml
+python-dateutil
