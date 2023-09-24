@@ -10,7 +10,7 @@ import random
 import dateutil.parser
 import datetime
 import sys
-import solaredge # type: ignore
+import solaredge  # type: ignore
 import logging
 import typing
 import yaml
@@ -23,12 +23,6 @@ REGION = "SE3"
 CONTROL_BASE = (
     "https://poolheater-2a8c2-default-rtdb.europe-west1.firebasedatabase.app/"
 )
-
-# Curve documentation:
-# https://cdn.jseducation.se/files/pages/carrier-anv.pdf
-#
-# Registers:
-# https://online.husdata.se/h-docs/C00.pdf
 
 
 class Price(typing.TypedDict):
@@ -241,10 +235,12 @@ def solaredge_get_current(db: Database, se: SolarEdgeConfig) -> float:
     return w
 
 
-def aquatemp_login(db: Database, at: AquaTempConfig) -> typing.Tuple[str, str]:
+def aquatemp_login(
+    db: Database, at: AquaTempConfig, force: bool = True
+) -> typing.Tuple[str, str]:
     key = "aquatemptokenandid"
 
-    if key in db:
+    if not force and key in db:
         l = json.loads(db[key].decode("ascii"))
         (token, id) = l[0], l[1]
         return (token, id)
@@ -333,8 +329,12 @@ def aquatemp_set_target_temp(db: Database, token: str, id: str, temp: float) -> 
 
 
 def is_heating(db: Database, secret: SecretConfig, config: Config) -> bool:
-    (token, id) = aquatemp_login(db, secret["aquatemp"])
-    t = aquatemp_get_target_temp(db, token, id)
+    try:
+        (token, id) = aquatemp_login(db, secret["aquatemp"])
+        t = aquatemp_get_target_temp(db, token, id)
+    except SystemError:
+        (token, id) = aquatemp_login(db, secret["aquatemp"], force=True)
+        t = aquatemp_get_target_temp(db, token, id)
 
     return not (t == config["lowtemp"])
 
