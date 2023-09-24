@@ -236,7 +236,7 @@ def solaredge_get_current(db: Database, se: SolarEdgeConfig) -> float:
 
 
 def aquatemp_login(
-    db: Database, at: AquaTempConfig, force: bool = True
+    db: Database, at: AquaTempConfig, force: bool = False
 ) -> typing.Tuple[str, str]:
     key = "aquatemptokenandid"
 
