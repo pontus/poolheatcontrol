@@ -12,6 +12,7 @@ import datetime
 import sys
 import solaredge  # type: ignore
 import logging
+import logging.handlers
 import typing
 import yaml
 import hashlib
