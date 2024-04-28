@@ -104,7 +104,7 @@ def override_active(config: NetConfig) -> typing.Tuple[bool, bool]:
     if not "override" in config:
         return (False, False)
 
-    now = datetime.datetime.now().timestamp()
+    now = datetime.datetime.now().astimezone().timestamp()
     for p in config["override"]:
         try:
             start = dateutil.parser.parse(p["start"]).astimezone().timestamp()
