@@ -146,7 +146,7 @@ def setup_logger(
     logger.setLevel(min(file_level, console_level))
 
 
-def price_apply(x: Price, config: Config) -> bool:
+def price_apply(x: Price) -> bool:
     today = datetime.datetime.now()
     if x["timestamp"].day == today.day:
         return True
@@ -194,9 +194,9 @@ def should_heat(db: Database, config: Config, secrets: SecretConfig) -> bool:
     return False
 
 
-def get_prices(db: Database) -> list[Price]:
+def get_prices(db: Database, force: bool = False) -> list[Price]:
     key = f"prices{time.strftime('%Y%m%d')}"
-    if key in db:
+    if key in db and not force:
         pricedata = db[key]
     else:
         logger.debug("Fetching spot prices")
@@ -215,6 +215,13 @@ def get_prices(db: Database) -> list[Price]:
         return r
 
     fixed = list(map(fix_entry, json.loads(pricedata)))
+    filtered = list(filter(price_apply, fixed))
+
+    if not force and not len(filtered):
+        # No entries, try with force if this isn't forced
+        return get_prices(db, True)
+
+    return filtered
 
     return fixed
 
